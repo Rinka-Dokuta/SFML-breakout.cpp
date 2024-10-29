@@ -1,0 +1,176 @@
+#include <iostream> 
+#include <SFML/Graphics.hpp>
+using namespace std;
+
+//Brick class--------------------------------------------------------------------------
+class Brick {
+private:
+	float width;
+	float height;
+	float xpos;
+	float ypos;
+	bool Dead;
+	sf::RectangleShape shape;
+
+public:
+	//Constructor initializes the brick
+	Brick(float x, float y, float w, float h) {
+		xpos = x;
+		ypos = y;
+		width = w;
+		height = h;
+		Dead = false;
+
+		//set up the shape
+		shape.setSize(sf::Vector2f(width, height));
+		shape.setPosition(xpos, ypos);
+		shape.setFillColor(sf::Color::Red);
+	}
+
+	//Draw brick on the window
+	void draw(sf::RenderWindow& window) {
+		if (!Dead) {
+			window.draw(shape);
+		}
+
+	}
+
+	//Marks the brick as 'dead'
+	void killBrick() {
+		Dead = true;
+		shape.setFillColor(sf::Color::Transparent); //Makes brick invisible
+	}
+
+	//accessor functions: let other classes see/use your private variables
+	float getX() { return xpos; }
+	float getY() { return ypos; }
+	float getW() { return width; }
+	float getH() { return height; }
+	bool isDead() { return Dead; }
+
+};//End of brick class---------------------------------------------------------------------
+
+//Ball class---------------------------------------------------------------------------
+class Ball {
+private:
+	float xpos;
+	float ypos;
+	float radius;
+	float xvel;
+	float yvel;
+	bool Dead;
+	sf::CircleShape shape;
+
+public:
+	//Constructor initializes the ball
+	Ball(float x, float y, float xv, float yv, float r) {
+		xpos = xpos;
+		ypos = ypos;
+		xvel = xv;
+		yvel = yv;
+		radius = r;
+		Dead = false;
+
+		//set up the shape
+		shape.setRadius(radius);
+		shape.setPosition(xpos, ypos);
+		shape.setFillColor(sf::Color::White);
+
+	}
+
+	//Draw ball on the window
+	void draw(sf::RenderWindow& window) {
+		if (!Dead) {
+			window.draw(shape);
+		}
+
+	}
+
+	//Moves the ball and handles boundary collision
+	void move(float windowWidth, float windowHeight) {
+		xpos += xvel;
+		ypos += yvel;
+
+
+		//Check for collision with the left and right window bounds
+		if (xpos <= 0 || xpos + radius * 2 >= windowWidth) {
+			xvel = -xvel; //Reverse horizontal direction
+		}
+
+		//Check for collision with the up and down window bounds
+		if (ypos <= 0 || ypos + radius * 2 >= windowHeight) {
+			yvel = -yvel; //Reverse vertical direction
+		}
+
+	}
+	//Check for collison with a brick
+	bool brickCollision(Brick& brick) {
+		if (!brick.isDead() && //Ensure brick in not dead)
+			xpos + radius > brick.getX() &&
+			xpos - radius < brick.getX() + brick.getW() &&
+			ypos + radius > brick.getY() &&
+			ypos - radius < brick.getY() + brick.getH()) {
+			brick.killBrick();
+			reflect(); //Reflect the ball vertically
+			return true;
+		}
+		return false;
+
+
+	}
+	void reflect() { yvel *= -1; }
+
+};//End of ball class-------------------------------------------------------------------------
+
+
+
+int main() {
+	//Create the main window
+	sf::RenderWindow window(sf::VideoMode(800, 600), "Breakout Game");
+	
+	//Brick instantiation
+	Brick brick1(100, 100, 50, 20);
+	Brick brick2(160, 100, 50, 20);
+	Brick brick3(220, 100, 50, 20);
+	Brick brick4(280, 100, 50, 20);
+	Brick brick5(340, 100, 50, 20);
+	Brick brick6(400, 100, 50, 20);
+	//Ball instantiation
+	//(Bugged)Ball ball(100, 100, 50, 20);
+
+
+
+	//Game loop----------------------------------------------------------
+	while (window.isOpen()) {
+		sf::Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+		
+		//physics section
+		
+		
+		
+		
+		
+		
+		//Render section
+		window.clear();
+
+		brick1.draw(window);
+		brick2.draw(window);
+		brick3.draw(window);
+		brick4.draw(window);
+		brick5.draw(window);
+		brick6.draw(window);
+
+		//(Bugged) ball.draw(window);
+
+		//update window (like display flip)
+		window.display();
+
+	}//end of game loop-----------------------------------------
+
+	return 0;
+}//end of main-------------------------------------------------------------------
